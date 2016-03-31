@@ -25,7 +25,6 @@ public class UserController {
 	private long expMillis = nowMillis + daysMillis;
 	private Date now = new Date(nowMillis);
     Date exp = new Date(expMillis);
-    
 
     @Autowired
     private AccountRepository accountRepository;
