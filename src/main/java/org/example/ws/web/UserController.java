@@ -2,6 +2,7 @@ package org.example.ws.web;
 
 import java.security.Principal;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.example.ws.model.Account;
 import org.example.ws.repository.AccountRepository;
@@ -18,6 +19,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+	
+	private long daysMillis = TimeUnit.MILLISECONDS.convert(90, TimeUnit.DAYS); 
+	private long nowMillis = System.currentTimeMillis();
+	private long expMillis = nowMillis + daysMillis;
+	private Date now = new Date(nowMillis);
+    Date exp = new Date(expMillis);
+    
 
     @Autowired
     private AccountRepository accountRepository;
@@ -32,7 +40,7 @@ public class UserController {
     	Account account = accountRepository.findByUsername(name);
     	
         return new LoginResponse(Jwts.builder().setSubject(account.getUsername())
-            .claim("roles", account.getRoles()).setIssuedAt(new Date())
+            .claim("roles", account.getRoles()).setIssuedAt(now).setExpiration(exp)
             .signWith(SignatureAlgorithm.HS256, "secretkey").compact());
         
     }
