@@ -18,7 +18,6 @@ DROP TABLE IF EXISTS `Role`;
 
 CREATE TABLE Account (
   id BIGINT NOT NULL AUTO_INCREMENT,
-  referenceId VARCHAR(255) NOT NULL,
   username VARCHAR(100) NOT NULL,
   password VARCHAR(200) NOT NULL,
   enabled BOOLEAN DEFAULT true NOT NULL,
@@ -31,7 +30,6 @@ CREATE TABLE Account (
   updatedBy VARCHAR(100) DEFAULT NULL,
   updatedAt DATETIME DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UQ_Account_ReferenceId UNIQUE (referenceId),
   CONSTRAINT UQ_Account_Username UNIQUE (username)
 );
 
