@@ -1,6 +1,7 @@
 package org.example.ws;
 
 import org.example.ws.security.AccountAuthenticationProvider;
+import org.example.ws.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * The SecurityConfiguration class provides a centralized location for
@@ -55,16 +57,15 @@ public class SecurityConfiguration {
         auth.authenticationProvider(accountAuthenticationProvider);
 
     }
-
+    
     /**
-     * This inner class configures a WebSecurityConfigurerAdapter instance for
-     * the web service API context paths.
+     * Customização criada para implementar o JWT
+     * Retorna um token tipo JWT após logado com sucesso
      * 
-     * @author Matt Warman
+     * @author Fernando Falcão
      */
     @Configuration
-    @Order(1)
-    public static class ApiWebSecurityConfigurerAdapter
+    public static class LoginWebSecurityConfigurerAdapter
             extends WebSecurityConfigurerAdapter {
 
         @Override
@@ -74,8 +75,8 @@ public class SecurityConfiguration {
             
             http
               .csrf().disable()
-              .antMatcher("/api/**")
-                .authorizeRequests()
+              .antMatcher("/user/**")
+              .authorizeRequests()
                   .anyRequest().hasRole("USER")
               .and()
               .httpBasic()
@@ -88,7 +89,34 @@ public class SecurityConfiguration {
         }
 
     }
+    
+    /**
+     * Implementado filtro JWT afim de verificar se exite um token válido
+     * 
+     * 
+     * @author Fernando Falcão
+     */
+    @Configuration
+    @Order(1)
+    public static class ApiWebSecurityConfigurerAdapter
+            extends WebSecurityConfigurerAdapter {
 
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+
+            // @formatter:off
+            
+            http
+            .csrf().disable()
+            .antMatcher("/api/**")
+            .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
+            
+            // @formatter:on
+
+        }
+
+    }
+    
     /**
      * This inner class configures a WebSecurityConfigurerAdapter instance for
      * the Spring Actuator web service context paths.
