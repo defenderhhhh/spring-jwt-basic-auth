@@ -7,7 +7,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.DatatypeConverter;
 
+import org.example.ws.util.PropertyConfig;
 import org.springframework.web.filter.GenericFilterBean;
 
 import io.jsonwebtoken.Claims;
@@ -15,7 +17,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
 
 public class JwtFilter extends GenericFilterBean {
-
+	
 	@Override
     public void doFilter(final ServletRequest req,
                          final ServletResponse res,
@@ -30,8 +32,9 @@ public class JwtFilter extends GenericFilterBean {
         final String token = authHeader.substring(7); // The part after "Bearer "
 
         try {
-            final Claims claims = Jwts.parser().setSigningKey("secretkey")
-                .parseClaimsJws(token).getBody();
+            final Claims claims = Jwts.parser()
+            		.setSigningKey(DatatypeConverter.parseBase64Binary(PropertyConfig.SECRETKEY))
+            		.parseClaimsJws(token).getBody();
             request.setAttribute("claims", claims);
         }
         catch (final SignatureException e) {
